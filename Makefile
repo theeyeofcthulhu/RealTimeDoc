@@ -1,9 +1,9 @@
 CC=g++
-CFLAGS=-Wall -Wextra -pedantic -std=c++23
+CFLAGS=-MMD -Wall -Wextra -pedantic -std=c++23
 
 SRC=$(wildcard src/*.cpp)
 OBJ=$(SRC:%.cpp=%.o)
-HDR=$(wildcard src/*.hpp)
+DEP=$(OBJ:%.o=%.d)
 
 EXE=rtd
 LIBS=$(addprefix -l,fmt raylib fontconfig)
@@ -26,12 +26,12 @@ install: all
 	cp $(EXE) $(TARGET)/bin
 
 clean:
-	rm -f $(OBJ) $(EXE)
+	rm -f $(OBJ) $(DEP) $(EXE)
+
+-include $(DEP)
 
 $(EXE): $(OBJ)
 	$(CC) -o $@ $^ $(LIBS)
-
-$(OBJ): $(HDR)
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) -c -o $@ $<
