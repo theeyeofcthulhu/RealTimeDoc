@@ -14,8 +14,6 @@
 
 #include "format.hpp"
 
-#include <dbg.h>
-
 class TmpFile {
 public:
     TmpFile();
@@ -91,7 +89,8 @@ void raylib_loop(TmpFile &tf)
     int height = 450;
 
     int font_size = 32;
-    const int load_font_size = font_size * 4;
+    int load_font_size = font_size;
+    const int font_reloading_distance = 12;
 
     InitWindow(width, height, "RealTimeDoc");
     SetWindowState(FLAG_WINDOW_RESIZABLE);
@@ -126,6 +125,21 @@ void raylib_loop(TmpFile &tf)
         if (IsKeyDown(KEY_RIGHT_BRACKET) || IsKeyDown(KEY_LEFT_BRACKET)) {
             should_update = true;
             font_size += IsKeyDown(KEY_LEFT_BRACKET) ? -2 : 2;
+
+            // Reload fonts if displayed size is too different from loaded size
+            // TODO: think about dictionary for already loaded sizes (big memory footprint after loading)
+            if (abs(load_font_size - font_size) >= font_reloading_distance) {
+                load_font_size = font_size;
+                fmt::println("Reloading fonts with size {}", load_font_size);
+
+                UnloadFont(font);
+                font = LoadFontEx("resources/NotoSans-Regular.ttf",
+                        load_font_size, 0, 0xff);
+
+                UnloadFont(math_font);
+                math_font = LoadFontEx("resources/NotoSansMath-Regular.ttf",
+                        load_font_size, cp, codepoint_count);
+            }
         }
 
         if (GetMouseWheelMove() != 0.0f) {

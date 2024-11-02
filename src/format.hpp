@@ -3,8 +3,6 @@
 #include <iostream>
 #include <string_view>
 
-#include <dbg.h>
-
 struct Code {
     std::string_view code;
     std::string_view unicode;

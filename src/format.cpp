@@ -8,8 +8,6 @@
 
 #include "format.hpp"
 
-#include <dbg.h>
-
 const char *codepoints = "\u2227\u2228\u00ac "; // Last space apparently required
 const std::array<Code, 3> codes = {
     Code{ ":a", "\u2227", "\\wedge",    0.075f },
