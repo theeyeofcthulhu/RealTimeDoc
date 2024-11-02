@@ -15,12 +15,8 @@ all: debug
 debug: CFLAGS += -g
 debug: $(EXE)
 
-remake: clean debug
-.NOTPARALLEL: remake
-
 release: CFLAGS += -O3 -DNDEBUG
-release: clean $(EXE)
-.NOTPARALLEL: release
+release: $(EXE)
 
 install: all
 	cp $(EXE) $(TARGET)/bin
