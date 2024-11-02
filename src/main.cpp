@@ -12,6 +12,7 @@
 
 #include <raylib.h>
 
+#include "dbg.hpp"
 #include "format.hpp"
 
 class TmpFile {
@@ -43,7 +44,7 @@ TmpFile::TmpFile()
 
 TmpFile::~TmpFile()
 {
-    fmt::println("Deleting {}", tmp_fn);
+    LOG("Deleting {}", tmp_fn);
     if (remove(tmp_fn) == -1) {
         perror(fmt::format("Removing {}", tmp_fn).c_str());
     }
@@ -116,7 +117,7 @@ void raylib_loop(TmpFile &tf)
     while (true)
     {
         if (child_has_exited()) {
-            fmt::println("Vim has exited.");
+            LOG("Vim has exited.");
             break;
         }
 
@@ -130,7 +131,7 @@ void raylib_loop(TmpFile &tf)
             // TODO: think about dictionary for already loaded sizes (big memory footprint after loading)
             if (abs(load_font_size - font_size) >= font_reloading_distance) {
                 load_font_size = font_size;
-                fmt::println("Reloading fonts with size {}", load_font_size);
+                LOG("Reloading fonts with size {}", load_font_size);
 
                 UnloadFont(font);
                 font = LoadFontEx("resources/NotoSans-Regular.ttf",
@@ -202,7 +203,7 @@ void raylib_loop(TmpFile &tf)
 int main()
 {
     TmpFile tf;
-    fmt::println("Temporary file: {}", tf.fn());
+    LOG("Temporary file: {}", tf.fn());
 
     pid_t pid = fork();
 
@@ -215,13 +216,15 @@ int main()
             perror("freopen(\"rtd-log.txt\")");
         }
 
+#ifndef NDEBUG
         std::time_t secs = std::time(nullptr);
-        fmt::println("BEGIN {}", std::asctime(std::localtime(&secs)));
+#endif
+        LOG("BEGIN {}", std::asctime(std::localtime(&secs)));
 
         // Exits when Vim exits
         raylib_loop(tf);
 
-        fmt::println("END {}", std::asctime(std::localtime(&secs)));
+        LOG("END {}", std::asctime(std::localtime(&secs)));
 
         if (freopen("/dev/tty", "w", stdout) == NULL) {
             perror("freopen(\"/dev/tty\")");

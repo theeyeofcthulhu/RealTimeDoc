@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS=-g -Wall -Wextra -pedantic -std=c++23
+CFLAGS=-Wall -Wextra -pedantic -std=c++23
 
 SRC=$(wildcard src/*.cpp)
 OBJ=$(SRC:%.cpp=%.o)
@@ -10,13 +10,23 @@ LIBS=$(addprefix -l,fmt raylib fontconfig)
 
 TARGET=/usr/local
 
-all: $(EXE)
+all: debug
+
+debug: CFLAGS += -g
+debug: $(EXE)
+
+remake: clean debug
+.NOTPARALLEL: remake
+
+release: CFLAGS += -O3 -DNDEBUG
+release: clean $(EXE)
+.NOTPARALLEL: release
 
 install: all
 	cp $(EXE) $(TARGET)/bin
 
 clean:
-	rm $(OBJ) $(EXE)
+	rm -f $(OBJ) $(EXE)
 
 $(EXE): $(OBJ)
 	$(CC) -o $@ $^ $(LIBS)
